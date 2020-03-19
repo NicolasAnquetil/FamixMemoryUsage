@@ -40,6 +40,11 @@ FMUAnalyst >> metricsAsCSV: metrics [
 ]
 
 { #category : #accessing }
+FMUAnalyst >> models [
+	^models
+]
+
+{ #category : #accessing }
 FMUAnalyst >> models: aCollection [ 
 	models := aCollection collect: [ :m | FMUModelAnalysis new on: m ]
 ]
