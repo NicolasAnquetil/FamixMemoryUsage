@@ -16,6 +16,11 @@ Class {
 	#category : #FamixMemoryUsage
 }
 
+{ #category : #'instance creation' }
+FMUAnalyst class >> on: aCollection [
+	^ self new models: aCollection ; yourself
+]
+
 { #category : #api }
 FMUAnalyst >> allMetrics [
 	^#(nbEntities totalMemory)
@@ -46,7 +51,7 @@ FMUAnalyst >> models [
 
 { #category : #accessing }
 FMUAnalyst >> models: aCollection [ 
-	models := aCollection collect: [ :m | FMUModelAnalysis new on: m ]
+	models := aCollection collect: [ :m | FMUModelAnalysis on: m ]
 ]
 
 { #category : #metrics }

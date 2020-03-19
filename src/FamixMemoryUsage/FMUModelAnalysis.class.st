@@ -12,46 +12,50 @@ Class {
 	#name : #FMUModelAnalysis,
 	#superclass : #Object,
 	#instVars : [
-		'model',
 		'tally',
-		'classes'
+		'famixModel'
 	],
 	#category : #FamixMemoryUsage
 }
 
+{ #category : #'instance creation' }
+FMUModelAnalysis class >> on: aModel [
+	^self new on: aModel ; yourself
+]
+
 { #category : #api }
 FMUModelAnalysis >> dumpTallyAsCSV [
 	| cols |
-	cols := #(analyzedClassName codeSize instanceCount spaceForInstances).
+	cols := #(className instanceCount instanceSize totalMemory).
 	^String streamContents: [:str |
 		(NeoCSVWriter on: str)
 			fieldWriter: #optionalQuoted ;
 			lineEndConvention: #cr ;
 			nextPut: { self modelName } , cols allButFirst ;
 			addFields: cols ;
-			nextPutAll: (tally sorted: [:a :b | a analyzedClassName < b analyzedClassName]).
+			nextPutAll: (tally sorted: [:a :b | a className < b className]).
 		str
 	]
 ]
 
 { #category : #accessing }
 FMUModelAnalysis >> modelName [
-	^ model name
+	^ famixModel name
 ]
 
 { #category : #metrics }
 FMUModelAnalysis >> nbEntities [
-	^model entities size
+	^famixModel entities size
 ]
 
 { #category : #'instance creation' }
 FMUModelAnalysis >> on: aFamixModel [ 
-	model := aFamixModel.
-	classes := model entities collectAsSet: #class.
-	tally := SpaceTally new spaceTally: classes
+	famixModel := aFamixModel.
+	tally := (famixModel entities collectAsSet: #class) collect: [:c | FMUClassTally on: c inModel: famixModel ].
+	
 ]
 
 { #category : #metrics }
 FMUModelAnalysis >> totalMemory [
-	^(tally collect: #spaceForInstances) sum
+	^(tally collect: #totalMemory) sum
 ]
