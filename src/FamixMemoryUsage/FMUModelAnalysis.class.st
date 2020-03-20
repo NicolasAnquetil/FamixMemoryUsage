@@ -24,15 +24,24 @@ FMUModelAnalysis class >> on: aModel [
 ]
 
 { #category : #api }
-FMUModelAnalysis >> dumpTallyAsCSV [
-	| cols |
-	cols := #(className instanceCount instanceSize totalMemory).
+FMUModelAnalysis >> allMetrics [
+	^#(className instanceCount instanceSize totalMemory)
+]
+
+{ #category : #api }
+FMUModelAnalysis >> allMetricsAsCSV [
+	^self metricsAsCSV: self allMetrics.
+]
+
+{ #category : #api }
+FMUModelAnalysis >> metricsAsCSV: metrics [
+	"first metric is expected to be the classNames"
 	^String streamContents: [:str |
 		(NeoCSVWriter on: str)
 			fieldWriter: #optionalQuoted ;
 			lineEndConvention: #cr ;
-			nextPut: { self modelName } , cols allButFirst ;
-			addFields: cols ;
+			nextPut: { self modelName } , metrics allButFirst ;
+			addFields: metrics ;
 			nextPutAll: (tally sorted: [:a :b | a className < b className]).
 		str
 	]
@@ -51,7 +60,7 @@ FMUModelAnalysis >> nbEntities [
 { #category : #'instance creation' }
 FMUModelAnalysis >> on: aFamixModel [ 
 	famixModel := aFamixModel.
-	tally := (famixModel entities collectAsSet: #class) collect: [:c | FMUClassTally on: c inModel: famixModel ].
+	tally := (famixModel entities collectAsSet: #class) collect: [:c | FMUClassAnalysis on: c inModel: famixModel ].
 	
 ]
 
